@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MEH</title>
+    <script>
+      function changeBackground(color) {
+        const flashers = document.querySelectorAll(".flasher");
+        for (let i = 0; i < flashers.length; i++) {
+          if (flashers[i].getAttribute("orientation") == "true") {
+            flashers[i].style["background-color"] =
+              color == "rgb(0, 255, 0)" ? "rgb(0, 255, 0)" : "rgb(255, 65, 0)";
+          } else {
+            flashers[i].style["background-color"] = color;
+          }
+        }
+        setTimeout(
+          () =>
+            changeBackground(
+              color == "rgb(0, 255, 0)"
+                ? "rgb(255, 137, 255)"
+                : "rgb(0, 255, 0)"
+            ),
+          0.45 * 1000
+        );
+      }
+      changeBackground("rgb(0, 255, 0)");
+    </script>
+    <style>
+      body {
+        margin: 0px;
+        background-color: rgb(255, 255, 0);
+        height: 100vh;
+        max-height: 100%;
+        width: 100vw;
+        max-width: 100%;
+      }
+
+      .flasher {
+        height: 33.33vh;
+        width: 33.33vh;
+        background-color: rgb(0, 255, 0);
+      }
+
+      #non-active {
+        height: 33.33vh;
+        width: 33.33vh;
+        background-color: rgb(255, 255, 0);
+      }
+
+      .cornersFlasherRow {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .centerFlasherRow {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cornersFlasherRow">
+      <div class="flasher" orientation="true"></div>
+      <div class="flasher"></div>
+    </div>
+    <div class="centerFlasherRow"><div id="non-active"></div></div>
+    <div class="cornersFlasherRow">
+      <div class="flasher"></div>
+      <div class="flasher"></div>
+    </div>
+  </body>
+</html>

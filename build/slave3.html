@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>MEH</title>
+    <script>
+        async function wait(dt) {
+            return new Promise((res, rej) => {
+                setInterval(res, dt);
+            });
+        }
+
+        const pulseAmtPerInterval = 5;
+        let color = true;
+        function pulseBackground() {
+            const flashers = document.querySelectorAll(".flasher");
+            for (let i = 0; i < flashers.length; i++) {
+                flashers[i].style["background-color"] = color ? "hsl(240, 100%, 50%)" : "black";
+            }
+            color = !color;
+        }
+        setInterval(() => pulseBackground(), 1000 / pulseAmtPerInterval);
+    </script>
+    <style>
+        body {
+            margin: 0px;
+            background-color: red;
+            height: 100vh;
+            max-height: 100%;
+            width: 100vw;
+            max-width: 100%;
+        }
+
+        .flasher {
+            height: 33.33vh;
+            width: 33.33vh;
+            background-color: black;
+        }
+
+        .cornersFlasherRow {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .centerFlasherRow {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cornersFlasherRow">
+        <div class="flasher"></div>
+        <div class="flasher"></div>
+    </div>
+    <div class="centerFlasherRow">
+        <div class="flasher"></div>
+    </div>
+    <div class="cornersFlasherRow">
+        <div class="flasher"></div>
+        <div class="flasher"></div>
+    </div>
+</body>
+
+</html>

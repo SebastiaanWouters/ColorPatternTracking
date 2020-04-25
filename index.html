@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Ok Boomer</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+  <style>
+    html {
+      width: 100vw;
+      height: 100vh;
+      min-width: 100vw;
+      min-height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      min-width: 100vw;
+      min-height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+      margin: 0px;
+    }
+
+    #cameraContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    #camera {
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #cameraViewFloater {
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #cameraViewPortContainer {
+      height: 100%;
+      width: 100%;
+      position: relative;
+    }
+
+    #cameraSettings {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 100000;
+      background-color: rgba(0, 0, 0, 0.75);
+      display: none;
+    }
+
+    .settingsScreenContainer {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    #cameraSettingsRangeButtonsContainer {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      flex: 50;
+    }
+
+    #cameraSettingsCloseButtonContainer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px;
+      flex: 1;
+    }
+
+    #settingsSlidersBackButton {
+      font-size: 45px;
+      color: rgb(241, 241, 241);
+      width: 50px;
+      height: 50px;
+    }
+
+    #cameraEnvSlidersContainer {
+      display: none;
+    }
+
+    .cameraOverlay {
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
+    }
+
+    #cameraOverlay {
+      z-index: 2;
+    }
+
+    #cameraEnvironmentChangeOverlay {
+      z-index: 3;
+      background-color: black;
+      display: none;
+    }
+
+    #cameraScreenColorsOverlay {
+      z-index: 4;
+      background-color: black;
+      display: none;
+    }
+
+    #cameraButtonsContainer {
+      padding-top: 20px;
+      height: calc(100% - 20px);
+      width: 15%;
+      margin-left: calc(100% - 15%);
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      background-color: rgba(0, 0, 0, 0.25);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .circularButtonContainer1 {
+      flex: 9;
+    }
+
+    .circularButtonContainer2 {
+      flex: 11;
+    }
+
+    .button {
+      cursor: pointer;
+    }
+
+    .circle {
+      border-radius: 1000px;
+    }
+
+    #confirmButton {
+      background-color: red;
+      width: 8vh;
+      height: 8vh;
+      border-color: rgba(255, 255, 255, 0.5);
+      border-width: 10px;
+      border-style: solid;
+    }
+
+    #confirmButton:focus {
+      background-color: rgba(0, 0, 0, 0.25);
+    }
+
+    #settingsButtonIcon {
+      font-size: 45px;
+      color: rgb(241, 241, 241);
+    }
+
+    #settingsButtonIcon:focus {
+      background-color: rgba(0, 0, 0, 0.25);
+    }
+
+    #cameraSettingsCloseButton {
+      font-size: 45px;
+      color: rgb(241, 241, 241);
+      width: 50px;
+      height: 50px;
+    }
+
+    #cameraSlidersContainer {
+      display: none;
+    }
+
+    #settingsSlidersScreen {
+      display: none;
+    }
+
+    #cameraSettingsCloseButton:focus {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .slider {
+      width: 75%;
+      outline: none;
+      appearance: none;
+      background: white;
+    }
+
+    .settingsSlidersContainer {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      flex: 50;
+      flex-direction: column;
+      padding-bottom: 25px;
+    }
+
+    .sliderWithText {
+      text-align: center;
+    }
+
+    .whiteText {
+      color: white;
+    }
+
+    .changeRangeButton {
+      width: 25%;
+      height: 10%;
+      background-color: rgb(241, 241, 241);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .changeRangeButton:focus {
+      background-color: rgba(0, 0, 0, 0.25);
+      color: white;
+    }
+  </style>
+</head>
+
+<body id="master">
+  <div id="cameraContainer">
+    <div id="cameraViewFloater">
+      <div id="cameraViewPortContainer">
+        <video autoplay="true" id="camera"></video>
+        <canvas id="cameraEnvironmentChangeOverlay" class="cameraOverlay"></canvas>
+        <canvas id="cameraScreenColorsOverlay" class="cameraOverlay"></canvas>
+        <canvas id="cameraOverlay" class="cameraOverlay"></canvas>
+      </div>
+    </div>
+    <div id="cameraButtonsContainer">
+      <div class="circularButtonContainer1">
+        <div class="circle button" id="settingsButton" tabindex="0">
+          <i class="material-icons" id="settingsButtonIcon">settings</i>
+        </div>
+      </div>
+      <div class="circularButtonContainer2">
+        <div class="circle button" id="confirmButton" tabindex="0"></div>
+      </div>
+    </div>
+    <div id="cameraSettings">
+      <div class="settingsScreenContainer" id="cameraRangeSelectionContainer">
+        <div id="cameraSettingsCloseButtonContainer">
+          <div class="circle button" id="cameraSettingsCloseButton" tabindex="0">
+            <div>
+              <- </div>
+            </div>
+          </div>
+          <div id="cameraSettingsRangeButtonsContainer">
+            <div class="changeRangeButton button" id="cameraSettingsEnvRangeButton" tabindex="0">
+              <div>
+                <h3>Change environment range</h3>
+              </div>
+            </div>
+            <div class="changeRangeButton button" id="cameraSettingsScreenRangeButton" tabindex="0">
+              <div>
+                <h3>Change screen range</h3>
+              </div>
+            </div>
+            <div class="changeRangeButton button" id="cameraSettingsBlobRangeButton" tabindex="0">
+              <div>
+                <h3>Change pixel combine distance</h3>
+              </div>
+            </div>
+            <div class="changeRangeButton button" id="cameraSettingsPatternRangeButton" tabindex="0">
+              <div>
+                <h3>Change range for pattern colors</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="settingsScreenContainer" id="cameraSlidersContainer">
+          <div id="cameraSettingsCloseButtonContainer">
+            <div class="circle button" id="settingsSlidersBackButton" tabindex="0">
+              <div>
+                <- </div>
+              </div>
+            </div>
+            <div class="settingsSlidersContainer" id="settingSlidersEnv">
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingSlidersTextEnv_h">H-value (0-360): 50</h3>
+                <input class="slider" id="settingSlidersEnv_h" type="range" min="1" max="360" value="50" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingSlidersTextEnv_s">S-value (0-100): 50</h3>
+                <input class="slider" id="settingSlidersEnv_s" type="range" min="1" max="100" value="40" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingSlidersTextEnv_l">L-value (0-100): 50</h3>
+                <input class="slider" id="settingSlidersEnv_l" type="range" min="1" max="100" value="40" />
+              </div>
+            </div>
+            <div class="settingsSlidersContainer" id="settingsSlidersScreen">
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingsSlidersTextScreen_h">H-value (0-360): 50</h3>
+                <input class="slider" id="settingsSlidersScreen_h" type="range" min="1" max="360" value="50" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingsSlidersTextScreen_s">S-value (0-100): 50</h3>
+                <input class="slider" id="settingsSlidersScreen_s" type="range" min="1" max="100" value="40" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingsSlidersTextScreen_l">L-value (0-100): 50</h3>
+                <input class="slider" id="settingsSlidersScreen_l" type="range" min="1" max="100" value="40" />
+              </div>
+            </div>
+            <div class="settingsSlidersContainer" id="settingsSlidersBlobRange">
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingsSlidersBlobRange_text">H-value (1-400): 25</h3>
+                <input class="slider" id="settingsSlidersBlobRange_slider" type="range" min="1" max="400" value="25" />
+              </div>
+              
+            </div>
+            <div class="settingsSlidersContainer" id="settingsSlidersPatternRange">
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingsSlidersPatternRange_text">H-Range (1-360): 25</h3>
+                <input class="slider" id="settingsSlidersPatternRange_slider" type="range" min="1" max="360" value="25" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingsSlidersPatternRange_text_s">S-Range (0-100): 40</h3>
+                <input class="slider" id="settingsSlidersPatternRange_slider_s" type="range" min="1" max="100" value="40" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="settingsSlidersPatternRange_text_l">L-Range (0-100): 40</h3>
+                <input class="slider" id="settingsSlidersPatternRange_slider_l" type="range" min="1" max="100" value="40" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="accuracy_text">Accuracy (1-8): 2</h3>
+                <input class="slider" id="accuracy_slider" type="range" min="1" max="8" value="2" />
+              </div>
+              <div class="sliderWithText">
+                <h3 class="whiteText" id="range_text">Depth (1-12): 6</h3>
+                <input class="slider" id="range_slider" type="range" min="3" max="12" value="5" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="bundle.js"></script>
+</body>
+
+</html>

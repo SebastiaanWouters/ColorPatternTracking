@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>MEH</title>
+  <script>
+    function changeBackground(color) {
+      const flashers = document.querySelectorAll(".flasher");
+      for (let i = 0; i < flashers.length; i++) {
+        flashers[i].style["background-color"] = color;
+      }
+      setTimeout(
+        () =>
+          changeBackground(
+            color == "rgb(0, 255, 255)" ? "rgb(191, 191, 64)" : "rgb(0, 255, 255)"
+          ),
+        0.25 * 1000
+      );
+    }
+    changeBackground("rgb(0, 255, 255)");
+  </script>
+  <style>
+    body {
+      margin: 0px;
+      background-color: black;
+      height: 100vh;
+      max-height: 100%;
+      width: 100vw;
+      max-width: 100%;
+    }
+
+    .flasher {
+      height: 33.33vh;
+      width: 33.33vh;
+      background-color: rgb(0, 255, 255);
+    }
+
+    .cornersFlasherRow {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .centerFlasherRow {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="cornersFlasherRow">
+    <div class="flasher"></div>
+    <div class="flasher"></div>
+  </div>
+  <div class="centerFlasherRow">
+    <div class="flasher"></div>
+  </div>
+  <div class="cornersFlasherRow">
+    <div class="flasher"></div>
+    <div class="flasher"></div>
+  </div>
+</body>
+
+</html>
