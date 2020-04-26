@@ -1232,7 +1232,7 @@ async function livePatternTracker() {
       if (!started) {
         started = true;
         console.log("button pressed")
-        setInterval(startDetection, 350);
+        setInterval(startDetection, 300);
         function startDetection() {
           takeSnap();
           const Result = patternDetector.detect(trackingSnap, similarPatternColorRange, similarPatternColorRange, similarPatternColorRange, patternAccuracy);
