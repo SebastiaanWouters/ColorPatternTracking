@@ -1189,6 +1189,41 @@ async function livePatternTracker() {
       cameraCtx.putImageData(imageData, 0, 0);
     
     }
+    
+    /**
+     * Function used to draw all the centerpoints that were found on to the camera overlay, so
+     * that the user can visibly see if the centers were correctly found.
+     * 
+     * @param canvas 
+     * @param Points 
+     */
+    function drawCenterWithoutIdentifiers(canvas: HTMLCanvasElement, Points: Point[]) {
+      let ctx = canvas.getContext('2d');
+      cameraCtx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+      let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let data = imageData.data;
+    
+        Points.forEach( (point) => {  
+          for (let x = point.x - 3; x <= point.x + 3; x++) {
+            for (let y = point.y - 3; y <= point.y + 3; y++) {
+                const i = y * (canvas.width * 4) + x * 4;
+                data[i]     = 0;     // red
+                data[i + 1] = 0; // green
+                data[i + 2] = 0; // blue
+                data[i+3] = 255;
+              }
+          }
+        });
+      
+      
+      cameraCtx.putImageData(imageData, 0, 0);
+    
+    }
 
   /**
    * All the pattern detection magic happens here after the button is pressed
@@ -1197,14 +1232,15 @@ async function livePatternTracker() {
       if (!started) {
         started = true;
         console.log("button pressed")
-        setInterval(startDetection, 500);
+        setInterval(startDetection, 350);
         function startDetection() {
           takeSnap();
           const Result = patternDetector.detect(trackingSnap, similarPatternColorRange, similarPatternColorRange, similarPatternColorRange, patternAccuracy);
           //drawOverlay(trackingSnap, Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3);
           const Result2 = patternDetector.calculateCenter(Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3, patternRange, patternAccuracy);
-          const Result3 = patternDetector.getCornerIdentifier(trackingSnap, Result2.centeredPoints,  identifierColorRange);
-          drawCenter(new CameraOverlay().elem, Result2.centeredPoints, Result3.identifierList);
+          //const Result3 = patternDetector.getCornerIdentifier(trackingSnap, Result2.centeredPoints,  identifierColorRange);
+          //drawCenter(new CameraOverlay().elem, Result2.centeredPoints, Result3.identifierList);
+          drawCenterWithoutIdentifiers(new CameraOverlay().elem, Result2.centeredPoints);
         }
       }
       else {
