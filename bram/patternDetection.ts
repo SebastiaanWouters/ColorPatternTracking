@@ -153,7 +153,7 @@ export class PatternDetector {
         //console.log(pointX + " " + pointY);
         if (centerPoints.length >= 1) {
           for (let i = 0; i < centerPoints.length; i++) {
-            if (centerPoints[i].distanceTo(Points1[p1]) < 15) {
+            if (centerPoints[i].distanceTo(Points1[p1]) < 12) {
               tooClose = true;
               //console.log(pointX + " " + pointY);
             }
