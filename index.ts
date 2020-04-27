@@ -67,9 +67,9 @@ const similarBlueColorRange: IHSLRange = {
   lRange: 10,
 };
 const similarPatternColorRange: IHSLRange = {
-  hRange: 30,
-  sRange: 45,
-  lRange: 35,
+  hRange: 32,
+  sRange: 46,
+  lRange: 36,
 };
 
 
