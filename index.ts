@@ -68,13 +68,8 @@ const similarBlueColorRange: IHSLRange = {
 };
 const similarPatternColorRange: IHSLRange = {
   hRange: 30,
-  sRange: 54,
+  sRange: 45,
   lRange: 35,
-};
-const identifierColorRange: IHSLRange = {
-  hRange: 52,
-  sRange: 50,
-  lRange: 40,
 };
 
 
@@ -1153,8 +1148,10 @@ async function livePatternTracker() {
       let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       let data = imageData.data;
     
-        Points.forEach( (point) => {  
+        Points.forEach( (point) => {
+          console.log(identifierList);
           const identifier = identifierList.slice(0,1)[0];
+          identifierList = identifierList.slice(1,identifierList.length-1);
           for (let x = point.x - 3; x <= point.x + 3; x++) {
             for (let y = point.y - 3; y <= point.y + 3; y++) {
               const i = y * (canvas.width * 4) + x * 4;
@@ -1182,9 +1179,6 @@ async function livePatternTracker() {
             }
           }
         });
-      
-    
-      
       
       cameraCtx.putImageData(imageData, 0, 0);
     
@@ -1237,10 +1231,10 @@ async function livePatternTracker() {
           takeSnap();
           const Result = patternDetector.detect(trackingSnap, similarPatternColorRange, similarPatternColorRange, similarPatternColorRange, patternAccuracy);
           //drawOverlay(trackingSnap, Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3);
-          const Result2 = patternDetector.calculateCenter(Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3, patternRange, patternAccuracy);
-          //const Result3 = patternDetector.getCornerIdentifier(trackingSnap, Result2.centeredPoints,  identifierColorRange);
-          //drawCenter(new CameraOverlay().elem, Result2.centeredPoints, Result3.identifierList);
-          drawCenterWithoutIdentifiers(new CameraOverlay().elem, Result2.centeredPoints);
+          const centerResults = patternDetector.calculateCenter(Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3, patternRange, patternAccuracy);
+          //const identifierResults = patternDetector.getCornerIdentifier(trackingSnap, centerResults.centeredPoints,  similarPatternColorRange);
+          //drawCenter(new CameraOverlay().elem, centerResults.centeredPoints, identifierResults.identifierList);
+          drawCenterWithoutIdentifiers(new CameraOverlay().elem, centerResults.centeredPoints);
         }
       }
       else {

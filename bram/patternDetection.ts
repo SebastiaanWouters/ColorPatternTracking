@@ -18,7 +18,6 @@ export class PatternDetector {
   static patternColor1: IHSLColor = rgbToHsl(255, 0, 0);
   static patternColor2: IHSLColor = rgbToHsl(0, 255, 0);
   static patternColor3: IHSLColor = rgbToHsl(0, 0, 255);
-  static blackColor: IHSLColor = rgbToHsl(0, 0, 255);
   static magentaColor: IHSLColor = rgbToHsl(255, 0, 255);
   static greenBlueColor: IHSLColor = rgbToHsl(0, 255, 255);
   static redGreenColor: IHSLColor = rgbToHsl(255, 255, 0);
@@ -153,7 +152,7 @@ export class PatternDetector {
         //console.log(pointX + " " + pointY);
         if (centerPoints.length >= 1) {
           for (let i = 0; i < centerPoints.length; i++) {
-            if (centerPoints[i].distanceTo(Points1[p1]) < 15) {
+            if (centerPoints[i].distanceTo(Points1[p1]) < 13) {
               tooClose = true;
               //console.log(pointX + " " + pointY);
             }
@@ -188,15 +187,15 @@ export class PatternDetector {
     } {
 
       let identifiers : number[] = [];
-      let blackCounter = 0;
       let magentaCounter = 0;
       let greenBlueCounter = 0;
       let redGreenCounter = 0;
-      let lookingForIdentifier = false;
-      let lookingForBlack = true;
+      let blackCounter = 0;
       let magentaFound = false;
       let greenBlueFound = false;
       let redGreenFound = false;
+      let blackFound = false;
+
       const canvasCtx = canvas.getContext("2d");
       const canvasPixelData = canvasCtx.getImageData(
         0,
@@ -208,38 +207,20 @@ export class PatternDetector {
       
       Points.forEach(  (point) => {
 
-      for (let y = point.y; y < point.y + 120; y += 1) {
+      for (let y = point.y; y < point.y + 130; y += 1) {
           const currColor = getHSLColorForPixel(
             point.x,
             y,
             canvas.width,
             canvasPixels
           );
-          const currColorRGB = getRGBAColorForPixel(
+          const currColorRGBA = getRGBAColorForPixel(
             point.x,
             y,
             canvas.width,
             canvasPixels
           );
-          if (lookingForBlack) {
-            const similarToBlack = (
-              (currColorRGB.r < 60 && currColorRGB.g < 60 && currColorRGB.b < 60) 
-            );
-            
-            if (similarToBlack) {
-                console.log("black found: " + point.x + " " + y + " center: " + point.x + " " + point.y)
-                blackCounter += 1;
-            } 
-            if (blackCounter > 4) {
-              console.log("All black has been found")
-              lookingForBlack = false;
-              lookingForIdentifier = true;
-            }
-
-
-          }
-          else if (lookingForIdentifier) {
-
+          
             const similarToMagenta = isSimilarHSLColor(
             currColor,
             PatternDetector.magentaColor,
@@ -252,66 +233,74 @@ export class PatternDetector {
             colorRange
             );
 
-            const similarToRedGreen = isSimilarHSLColor(
+            /**const similarToRedGreen = isSimilarHSLColor(
             currColor,
             PatternDetector.redGreenColor,
             colorRange
-            );
+            );*/
+
+            const similarToBlack = (currColorRGBA.r < 50 && currColorRGBA.g < 50 && currColorRGBA.b < 50) 
 
             if (similarToMagenta) {
               console.log("magenta found: " +  currColor.h + " " + currColor.s + " " + currColor.l)
               magentaCounter += 1;
             }
-            if (similarToRedGreen) {
+            /**if (similarToRedGreen) {
               console.log("redGreen found: " +  currColor.h + " " + currColor.s + " " + currColor.l)
               redGreenCounter += 1;
-            }
+            }*/
             if (similarToGreenBlue) {
               console.log("green blue found: " +  currColor.h + " " + currColor.s + " " + currColor.l)
               greenBlueCounter += 1;
             }
+            if (similarToBlack) {
+              console.log("black found: " +  currColor.h + " " + currColor.s + " " + currColor.l)
+              blackCounter += 1;
+            }
 
-            if (magentaCounter > 4) {
-              lookingForBlack = false;
+            if (magentaCounter > 3) {
               magentaFound = true;
             }
-            else if (redGreenCounter > 4) {
-              lookingForBlack = false;
+            /**else if (redGreenCounter > 3) {
               redGreenFound = true;
-            }
-            else if (greenBlueCounter > 4) {
-              lookingForBlack = false;
+            }*/
+            else if (greenBlueCounter > 3) {
               greenBlueFound = true;
+            }
+            else if (blackCounter > 3) {
+              blackFound = true;
+            }
+
+            if (magentaFound) {
+              identifiers.push(1);
+              break;
+            }
+            /**if (redGreenFound) {
+              identifiers.push(2);
+              break;
+            }*/
+            if (greenBlueFound) {
+              identifiers.push(3);
+              break;
+            }
+            if (blackFound) {
+              identifiers.push(4);
+              break;
             }
 
           }
-          if (magentaFound) {
-            identifiers.push(1);
-            break;
-          }
-          if (redGreenFound) {
-            identifiers.push(2);
-            break;
-          }
-          if (greenBlueFound) {
-            identifiers.push(3);
-            break;
-          }
           
-        }
-        if (!greenBlueFound && !redGreenFound && !magentaFound) {
-          identifiers.push(4)
-        }
-        
-        blackCounter = 0;
-        magentaCounter = 0;
-        redGreenCounter = 0;
-        greenBlueCounter = 0;
-        lookingForIdentifier = false;
-        lookingForBlack = true;
-        magentaFound = false;
-        greenBlueFound = false;
-        redGreenFound = false;
+      if (!greenBlueFound && !redGreenFound && !magentaFound && !blackFound) {
+            identifiers.push(4)
+      }
+      magentaCounter = 0;
+      blackCounter = 0;
+      redGreenCounter = 0;
+      greenBlueCounter = 0;
+      magentaFound = false;
+      greenBlueFound = false;
+      redGreenFound = false;
+      blackFound = false;
 
     });      
 
