@@ -33,7 +33,7 @@ import {
   CameraSettingsEnvRangeButton,
   CameraSettingsScreenRangeButton,
   CameraSettingsBlobRangeButton,
-  CameraSettingsPatternRangeButton
+  CameraSettingsPatternRangeButton,
 } from "./bram/jsHtml/master/camera/settings/cameraSettingsRangeButtons";
 import { CameraRangeSelectionContainer } from "./bram/jsHtml/master/camera/settings/CameraRangeSelectionContainer";
 import { CameraSlidersContainer } from "./bram/jsHtml/master/camera/settings/cameraSlidersContainers";
@@ -41,7 +41,7 @@ import {
   SettingSlidersEnv,
   SettingsSlidersScreen,
   SettingsSlidersBlobRange,
-  SettingsSlidersPatternRange
+  SettingsSlidersPatternRange,
 } from "./bram/jsHtml/master/camera/settings/slidersRanges";
 import { SettingsSlidersBackButton } from "./bram/jsHtml/master/camera/settings/SettingsSlidersBackButton";
 import { MasterHTMLElem } from "./bram/jsHtml/master/MasterHtml";
@@ -72,8 +72,8 @@ const similarPatternColorRange: IHSLRange = {
   lRange: 36,
 };
 
-
-let patternAccuracy = 2, patternRange = 6;
+let patternAccuracy = 2,
+  patternRange = 6;
 
 const blobPixelDistance = 30;
 const blobMatchDistance = 40;
@@ -101,8 +101,7 @@ async function pageLoad() {
 function initMasterUI() {
   new MasterHTMLElem().scale(1);
   window.scrollTo(0, 1);
-  
-  
+
   const cameraOverlayCanvas = new CameraOverlay();
   const cameraOverlayCtx = cameraOverlayCanvas.elem.getContext("2d");
 
@@ -136,7 +135,7 @@ function initMasterUI() {
     settingsSlidersScreen.hide();
     settingsSlidersPatternRange.hide();
   });
-  
+
   settingsSlidersPatternRange.hue = similarPatternColorRange.hRange;
   settingsSlidersPatternRange.saturation = similarPatternColorRange.sRange;
   settingsSlidersPatternRange.light = similarPatternColorRange.lRange;
@@ -346,7 +345,6 @@ async function circlesTest() {
     canDetectAgain = false;
     cameraOverlay.clear();
 
-
     const snap = camera.snap();
     const scale = 25 / 100;
     const resizedSnap = createCanvas(
@@ -390,7 +388,6 @@ async function circlesTest() {
       sobelCtx.fillRect(pixel.x, pixel.y, 1, 1);
     });
     ctx.drawImage(sobel, 0, 0, snap.width, snap.height);
-    
 
     ctx.fillStyle = "red";
     const dt = Date.now() - startTime;
@@ -458,7 +455,7 @@ async function circlesTest2() {
     camera.difference1(blancoSnapImageData, manipulationImgData);
     camera.applyBigGaussianBlurAndGrayScale(manipulationImgData);
     camera.applySharpen(manipulationImgData);
-    
+
     manipulationCtx.putImageData(manipulationImgData, 0, 0);
 
     ctx.drawImage(manipulationCanvas, 0, 0);
@@ -467,7 +464,7 @@ async function circlesTest2() {
   document.getElementById("confirmButton").onclick = () => {
     if (!blancoSnap) {
       takeBlanco();
-      console.log("detecting")
+      console.log("detecting");
     } else {
       const startTime = Date.now();
       detect();
@@ -476,9 +473,6 @@ async function circlesTest2() {
     }
   };
 }
-
-
-
 
 async function motionTest() {
   await pageLoad();
@@ -1052,198 +1046,209 @@ async function testColorDist() {
 }
 
 async function livePatternTracker() {
-
   await pageLoad();
 
   initMasterUI();
-  
-  
-  console.log("livePatternTracker available")
+
+  console.log("livePatternTracker available");
   let started = false;
   const patternDetector = new PatternDetector();
-  const camera = new Camera2();
+  const camera = new Camera3();
   await camera.start();
 
   const cameraOverlay = new CameraOverlay();
   const cameraCtx = cameraOverlay.elem.getContext("2d");
 
   let trackingSnap: HTMLCanvasElement;
-  
+
   function takeSnap() {
-    trackingSnap = camera.snap();
+    trackingSnap = camera.snap(0.25);
   }
 
-    
-    /**
-     * Draws an overlay over the camera with all the red,blue,green pixels that were detected in
-     * the detection algorithm from patternDetection.ts
-     * 
-     * @param canvas 
-     * @param Points 
-     * @param Points2 
-     * @param Points3 
-     */
-    function drawOverlay(canvas: HTMLCanvasElement, Points: Point[], Points2: Point[], Points3: Point[]) {
-      let ctx = canvas.getContext('2d');
-      let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      let data = imageData.data;
-    
-      Points.forEach( (point) => {
-          
-          for (let x = point.x - 1; x <= point.x + 1; x++) {
-            for (let y = point.y - 1; y <= point.y + 1; y++) {
-              const i = y * (canvas.width * 4) + x * 4;
-              data[i]     = 255;     // red
-              data[i + 1] = 0; // green
-              data[i + 2] = 0; // blue
-            }
-          }
-      });
+  /**
+   * Draws an overlay over the camera with all the red,blue,green pixels that were detected in
+   * the detection algorithm from patternDetection.ts
+   *
+   * @param canvas
+   * @param Points
+   * @param Points2
+   * @param Points3
+   */
+  function drawOverlay(
+    canvas: HTMLCanvasElement,
+    Points: Point[],
+    Points2: Point[],
+    Points3: Point[]
+  ) {
+    let ctx = canvas.getContext("2d");
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
 
-      Points2.forEach( (point) => {
-          
-        for (let x = point.x - 1; x <= point.x + 1; x++) {
-          for (let y = point.y - 1; y <= point.y + 1; y++) {
-            const i = y * (canvas.width * 4) + x * 4;
-            data[i]     = 0;     // red
-            data[i + 1] = 255; // green
-            data[i + 2] = 0; // blue
-          }
-        }
-    });
-
-    Points3.forEach( (point) => {
-          
+    Points.forEach((point) => {
       for (let x = point.x - 1; x <= point.x + 1; x++) {
         for (let y = point.y - 1; y <= point.y + 1; y++) {
           const i = y * (canvas.width * 4) + x * 4;
-          data[i]     = 0;     // red
-          data[i + 1] = 0;     // green
-          data[i + 2] = 255;   // blue
+          data[i] = 255; // red
+          data[i + 1] = 0; // green
+          data[i + 2] = 0; // blue
         }
       }
     });
-    
-    cameraCtx.putImageData(imageData, 0, 0);
-      
-    
-    }
 
-    /**
-     * Function used to draw all the centerpoints that were found on to the camera overlay, so
-     * that the user can visibly see if the centers were correctly found.
-     * 
-     * @param canvas 
-     * @param Points 
-     * @param identifierList 
-     */
-    function drawCenter(canvas: HTMLCanvasElement, Points: Point[], identifierList : number[]) {
-      let ctx = canvas.getContext('2d');
-      cameraCtx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-      let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      let data = imageData.data;
-    
-        Points.forEach( (point) => {
-          console.log(identifierList);
-          const identifier = identifierList.slice(0,1)[0];
-          identifierList = identifierList.slice(1,identifierList.length-1);
-          for (let x = point.x - 3; x <= point.x + 3; x++) {
-            for (let y = point.y - 3; y <= point.y + 3; y++) {
-              const i = y * (canvas.width * 4) + x * 4;
-              if (identifier == 1) {
-                data[i]     = 255;     // red
-                data[i + 1] = 0; // green
-                data[i + 2] = 255; // blue
-                data[i+3] = 255;
-              } else if (identifier == 2) {
-                data[i]     = 255;     // red
-                data[i + 1] = 255; // green
-                data[i + 2] = 0; // blue
-                data[i+3] = 255;
-              } else if (identifier == 3) {
-                data[i]     = 0;     // red
-                data[i + 1] = 255; // green
-                data[i + 2] = 255; // blue
-                data[i+3] = 255;
-              } else {
-                data[i]     = 0;     // red
-                data[i + 1] = 0; // green
-                data[i + 2] = 0; // blue
-                data[i+3] = 255;
-              }
-            }
+    Points2.forEach((point) => {
+      for (let x = point.x - 1; x <= point.x + 1; x++) {
+        for (let y = point.y - 1; y <= point.y + 1; y++) {
+          const i = y * (canvas.width * 4) + x * 4;
+          data[i] = 0; // red
+          data[i + 1] = 255; // green
+          data[i + 2] = 0; // blue
+        }
+      }
+    });
+
+    Points3.forEach((point) => {
+      for (let x = point.x - 1; x <= point.x + 1; x++) {
+        for (let y = point.y - 1; y <= point.y + 1; y++) {
+          const i = y * (canvas.width * 4) + x * 4;
+          data[i] = 0; // red
+          data[i + 1] = 0; // green
+          data[i + 2] = 255; // blue
+        }
+      }
+    });
+
+    cameraCtx.putImageData(imageData, 0, 0);
+  }
+
+  /**
+   * Function used to draw all the centerpoints that were found on to the camera overlay, so
+   * that the user can visibly see if the centers were correctly found.
+   *
+   * @param canvas
+   * @param Points
+   * @param identifierList
+   */
+  function drawCenter(
+    canvas: HTMLCanvasElement,
+    Points: Point[],
+    identifierList: number[]
+  ) {
+    let ctx = canvas.getContext("2d");
+    cameraCtx.clearRect(0, 0, canvas.width, canvas.height);
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
+
+    Points.forEach((point) => {
+      console.log(identifierList);
+      const identifier = identifierList.slice(0, 1)[0];
+      identifierList = identifierList.slice(1, identifierList.length - 1);
+      for (let x = point.x - 3; x <= point.x + 3; x++) {
+        for (let y = point.y - 3; y <= point.y + 3; y++) {
+          const i = y * (canvas.width * 4) + x * 4;
+          if (identifier == 1) {
+            data[i] = 255; // red
+            data[i + 1] = 0; // green
+            data[i + 2] = 255; // blue
+            data[i + 3] = 255;
+          } else if (identifier == 2) {
+            data[i] = 255; // red
+            data[i + 1] = 255; // green
+            data[i + 2] = 0; // blue
+            data[i + 3] = 255;
+          } else if (identifier == 3) {
+            data[i] = 0; // red
+            data[i + 1] = 255; // green
+            data[i + 2] = 255; // blue
+            data[i + 3] = 255;
+          } else {
+            data[i] = 0; // red
+            data[i + 1] = 0; // green
+            data[i + 2] = 0; // blue
+            data[i + 3] = 255;
           }
-        });
-      
-      cameraCtx.putImageData(imageData, 0, 0);
-    
-    }
-    
-    /**
-     * Function used to draw all the centerpoints that were found on to the camera overlay, so
-     * that the user can visibly see if the centers were correctly found.
-     * 
-     * @param canvas 
-     * @param Points 
-     */
-    function drawCenterWithoutIdentifiers(canvas: HTMLCanvasElement, Points: Point[]) {
-      let ctx = canvas.getContext('2d');
-      cameraCtx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-      let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      let data = imageData.data;
-    
-        Points.forEach( (point) => {  
-          for (let x = point.x - 3; x <= point.x + 3; x++) {
-            for (let y = point.y - 3; y <= point.y + 3; y++) {
-                const i = y * (canvas.width * 4) + x * 4;
-                data[i]     = 0;     // red
-                data[i + 1] = 0; // green
-                data[i + 2] = 0; // blue
-                data[i+3] = 255;
-              }
-          }
-        });
-      
-      
-      cameraCtx.putImageData(imageData, 0, 0);
-    
-    }
+        }
+      }
+    });
+
+    cameraCtx.putImageData(imageData, 0, 0);
+  }
+
+  /**
+   * Function used to draw all the centerpoints that were found on to the camera overlay, so
+   * that the user can visibly see if the centers were correctly found.
+   *
+   * @param canvas
+   * @param Points
+   */
+  function drawCenterWithoutIdentifiers(
+    canvas: HTMLCanvasElement,
+    Points: Point[]
+  ) {
+    let ctx = canvas.getContext("2d");
+    cameraCtx.clearRect(0, 0, canvas.width, canvas.height);
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
+
+    Points.forEach((point) => {
+      for (let x = point.x - 3; x <= point.x + 3; x++) {
+        for (let y = point.y - 3; y <= point.y + 3; y++) {
+          const i = y * (canvas.width * 4) + x * 4;
+          data[i] = 0; // red
+          data[i + 1] = 0; // green
+          data[i + 2] = 0; // blue
+          data[i + 3] = 255;
+        }
+      }
+    });
+
+    cameraCtx.putImageData(imageData, 0, 0);
+  }
 
   /**
    * All the pattern detection magic happens here after the button is pressed
    */
   document.getElementById("confirmButton").onclick = () => {
-      if (!started) {
-        started = true;
-        console.log("button pressed")
-        setInterval(startDetection, 300);
-        function startDetection() {
-          takeSnap();
-          const Result = patternDetector.detect(trackingSnap, similarPatternColorRange, similarPatternColorRange, similarPatternColorRange, patternAccuracy);
-          //drawOverlay(trackingSnap, Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3);
-          const centerResults = patternDetector.calculateCenter(Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3, patternRange, patternAccuracy);
-          //const identifierResults = patternDetector.getCornerIdentifier(trackingSnap, centerResults.centeredPoints,  similarPatternColorRange);
-          //drawCenter(new CameraOverlay().elem, centerResults.centeredPoints, identifierResults.identifierList);
-          drawCenterWithoutIdentifiers(new CameraOverlay().elem, centerResults.centeredPoints);
-        }
+    if (!started) {
+      started = true;
+      console.log("button pressed");
+      setInterval(startDetection, 300);
+      function startDetection() {
+        const startTime = Date.now();
+        takeSnap();
+        const Result = patternDetector.detect(
+          trackingSnap,
+          similarPatternColorRange,
+          similarPatternColorRange,
+          similarPatternColorRange,
+          patternAccuracy
+        );
+        //drawOverlay(trackingSnap, Result.detectedPoints1, Result.detectedPoints2, Result.detectedPoints3);
+        const centerResults = patternDetector.calculateCenter(
+          Result.detectedPoints1,
+          Result.detectedPoints2,
+          Result.detectedPoints3,
+          patternRange,
+          patternAccuracy
+        );
+        //const identifierResults = patternDetector.getCornerIdentifier(trackingSnap, centerResults.centeredPoints,  similarPatternColorRange);
+        //drawCenter(new CameraOverlay().elem, centerResults.centeredPoints, identifierResults.identifierList);
+        drawCenterWithoutIdentifiers(
+          new CameraOverlay().elem,
+          centerResults.centeredPoints.map(
+            (p) => new Point(p.x / 0.25, p.y / 0.25)
+          )
+        );
+        cameraCtx.fillStyle = "red";
+        cameraCtx.fillText(
+          "Frame took: " + (Date.now() - startTime) + "ms",
+          20,
+          20
+        );
       }
-      else {
-        started = false;  
-      }
-      
+    } else {
+      started = false;
     }
-  
-
+  };
 }
 /**
  * Initialize the pattern tracking
